@@ -1,0 +1,65 @@
+#![deny(
+    clippy::absolute_paths,
+    clippy::as_conversions,
+    clippy::as_pointer_underscore,
+    clippy::multiple_unsafe_ops_per_block,
+    clippy::pedantic,
+    ambiguous_negative_literals,
+    closure_returning_async_block,
+    future_incompatible,
+    impl_trait_redundant_captures,
+    let_underscore_drop,
+    macro_use_extern_crate,
+    meta_variable_misuse,
+    missing_copy_implementations,
+    missing_debug_implementations,
+    missing_docs,
+    non_ascii_idents,
+    nonstandard_style,
+    redundant_lifetimes,
+    rust_2018_idioms,
+    single_use_lifetimes,
+    trivial_casts,
+    trivial_numeric_casts,
+    unit_bindings,
+    unnameable_types,
+    unreachable_pub,
+    unstable_features,
+    unused,
+    variant_size_differences
+)]
+
+use windows::{
+    core::{implement, Result, PCWSTR},
+    Win32::{
+        Foundation::PROPERTYKEY,
+        Media::Audio::{
+            EDataFlow, ERole, IMMNotificationClient, IMMNotificationClient_Impl, DEVICE_STATE,
+        },
+    },
+};
+
+#[implement(IMMNotificationClient)]
+struct AudioEndpointCallback;
+
+impl IMMNotificationClient_Impl for AudioEndpointCallback_Impl {
+    fn OnDeviceStateChanged(&self, _: &PCWSTR, _: DEVICE_STATE) -> Result<()> {
+        Ok(())
+    }
+
+    fn OnDeviceAdded(&self, _: &PCWSTR) -> Result<()> {
+        Ok(())
+    }
+
+    fn OnDeviceRemoved(&self, _: &PCWSTR) -> Result<()> {
+        Ok(())
+    }
+
+    fn OnDefaultDeviceChanged(&self, _: EDataFlow, _: ERole, _: &PCWSTR) -> Result<()> {
+        Ok(())
+    }
+
+    fn OnPropertyValueChanged(&self, _: &PCWSTR, _: &PROPERTYKEY) -> Result<()> {
+        Ok(())
+    }
+}
