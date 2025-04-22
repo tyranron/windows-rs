@@ -43,6 +43,7 @@ fn gen_original_impl(inputs: &ImplementInputs) -> syn::Item {
     let constraints = &inputs.constraints;
 
     let mut output: syn::ItemImpl = parse_quote! {
+        #[automatically_derived]
         impl #generics #original_ident::#generics where #constraints {}
     };
 
@@ -86,8 +87,9 @@ fn gen_impl_struct(inputs: &ImplementInputs) -> syn::Item {
     });
 
     parse_quote! {
-        #[repr(C)]
+        #[automatically_derived]
         #[allow(non_camel_case_types)]
+        #[repr(C)]
         #vis struct #impl_ident #generics where #constraints {
             #impl_fields
         }
@@ -102,6 +104,7 @@ fn gen_impl_deref(inputs: &ImplementInputs) -> syn::Item {
     let impl_ident = &inputs.impl_ident;
 
     parse_quote! {
+        #[automatically_derived]
         impl #generics ::core::ops::Deref for #impl_ident::#generics where #constraints {
             type Target = #original_ident::#generics;
 
@@ -134,6 +137,7 @@ fn gen_impl_impl(inputs: &ImplementInputs) -> syn::Item {
     let constraints = &inputs.constraints;
 
     let mut output: syn::ItemImpl = parse_quote! {
+        #[automatically_derived]
         impl #generics #impl_ident::#generics where #constraints {}
     };
 
@@ -180,6 +184,7 @@ fn gen_iunknown_impl(inputs: &ImplementInputs) -> syn::Item {
     let trust_level = proc_macro2::Literal::usize_unsuffixed(inputs.trust_level);
 
     let mut output: syn::ItemImpl = parse_quote! {
+        #[automatically_derived]
         impl #generics ::windows_core::IUnknownImpl for #impl_ident::#generics where #constraints {
             type Impl = #original_ident::#generics;
 
@@ -250,6 +255,7 @@ fn gen_impl_com_object_inner(inputs: &ImplementInputs) -> syn::Item {
     let impl_ident = &inputs.impl_ident;
 
     parse_quote! {
+        #[automatically_derived]
         impl #generics ::windows_core::ComObjectInner for #original_ident::#generics where #constraints {
             type Outer = #impl_ident::#generics;
 
@@ -461,6 +467,7 @@ fn gen_impl_from(inputs: &ImplementInputs) -> Vec<syn::Item> {
     let constraints = &inputs.constraints;
 
     items.push(parse_quote! {
+        #[automatically_derived]
         impl #generics ::core::convert::From<#original_ident::#generics> for ::windows_core::IUnknown where #constraints {
             #[inline(always)]
             fn from(this: #original_ident::#generics) -> Self {
@@ -471,6 +478,7 @@ fn gen_impl_from(inputs: &ImplementInputs) -> Vec<syn::Item> {
     });
 
     items.push(parse_quote! {
+        #[automatically_derived]
         impl #generics ::core::convert::From<#original_ident::#generics> for ::windows_core::IInspectable where #constraints {
             #[inline(always)]
             fn from(this: #original_ident::#generics) -> Self {
@@ -485,6 +493,7 @@ fn gen_impl_from(inputs: &ImplementInputs) -> Vec<syn::Item> {
 
         items.push(parse_quote_spanned! {
             interface_chain.implement.span =>
+            #[automatically_derived]
             impl #generics ::core::convert::From<#original_ident::#generics> for #interface_ident where #constraints {
                 #[inline(always)]
                 fn from(this: #original_ident::#generics) -> Self {
@@ -511,6 +520,7 @@ fn gen_impl_com_object_interfaces(inputs: &ImplementInputs) -> Vec<syn::Item> {
     let impl_ident = &inputs.impl_ident;
 
     items.push(parse_quote! {
+        #[automatically_derived]
         impl #generics ::windows_core::ComObjectInterface<::windows_core::IUnknown> for #impl_ident::#generics where #constraints {
             #[inline(always)]
             fn as_interface_ref(&self) -> ::windows_core::InterfaceRef<'_, ::windows_core::IUnknown> {
@@ -523,6 +533,7 @@ fn gen_impl_com_object_interfaces(inputs: &ImplementInputs) -> Vec<syn::Item> {
     });
 
     items.push(parse_quote! {
+        #[automatically_derived]
         impl #generics ::windows_core::ComObjectInterface<::windows_core::IInspectable> for #impl_ident::#generics where #constraints {
             #[inline(always)]
             fn as_interface_ref(&self) -> ::windows_core::InterfaceRef<'_, ::windows_core::IInspectable> {
@@ -540,7 +551,7 @@ fn gen_impl_com_object_interfaces(inputs: &ImplementInputs) -> Vec<syn::Item> {
 
         items.push(parse_quote_spanned! {
             interface_chain.implement.span =>
-            #[allow(clippy::needless_lifetimes)]
+            #[automatically_derived]
             impl #generics ::windows_core::ComObjectInterface<#interface_ident> for #impl_ident::#generics where #constraints {
                 #[inline(always)]
                 fn as_interface_ref(&self) -> ::windows_core::InterfaceRef<'_, #interface_ident> {
@@ -569,6 +580,7 @@ fn gen_impl_as_impl(
 
     parse_quote_spanned! {
         interface_chain.implement.span =>
+        #[automatically_derived]
         impl #generics ::windows_core::AsImpl<#original_ident::#generics> for #interface_ident where #constraints {
             // SAFETY: the offset is guaranteed to be in bounds, and the implementation struct
             // is guaranteed to live at least as long as `self`.

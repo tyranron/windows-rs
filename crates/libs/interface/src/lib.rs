@@ -99,15 +99,19 @@ impl Interface {
         let conversions = self.gen_conversions();
 
         Ok(quote! {
+            #[automatically_derived]
             #[repr(transparent)]
             #(#docs)*
             #vis struct #name(#parent);
             #implementation
+            #[automatically_derived]
             unsafe impl ::windows_core::Interface for #name {
                 type Vtable = #vtable_name;
                 const IID: ::windows_core::GUID = #guid;
             }
+            #[automatically_derived]
             impl ::windows_core::RuntimeName for #name {}
+            #[automatically_derived]
             impl ::core::ops::Deref for #name {
                 type Target = #parent;
                 fn deref(&self) -> &Self::Target {
@@ -153,6 +157,7 @@ impl Interface {
             })
             .collect::<Vec<_>>();
         quote! {
+            #[automatically_derived]
             impl #name {
                 #(#methods)*
             }
@@ -179,6 +184,7 @@ impl Interface {
         let parent = self.parent_trait_constraint();
 
         quote! {
+            #[automatically_derived]
             #[allow(non_camel_case_types)]
             #vis trait #name: Sized + #parent {
                 #(#methods)*
@@ -298,12 +304,14 @@ impl Interface {
                 .collect::<Vec<_>>();
 
             quote! {
+                #[automatically_derived]
                 #[repr(C)]
                 #[doc(hidden)]
                 #vis struct #vtable_name {
                     pub base__: #parent_vtable,
                     #(#vtable_entries)*
                 }
+                #[automatically_derived]
                 impl #vtable_name {
                     pub const fn new<
                         Identity: ::windows_core::IUnknownImpl,
@@ -334,21 +342,26 @@ impl Interface {
                 .collect::<Vec<_>>();
 
             quote! {
+                #[automatically_derived]
                 #[repr(C)]
                 #[doc(hidden)]
                 #vis struct #vtable_name {
                     #(#vtable_entries)*
                 }
+                #[automatically_derived]
                 impl #vtable_name {
                     pub const fn new<Impl: #trait_name>() -> Self {
                         #(#functions)*
                         Self { #(#entries),* }
                     }
                 }
+                #[automatically_derived]
                 struct #implvtbl_name<T: #trait_name> (::core::marker::PhantomData<T>);
+                #[automatically_derived]
                 impl<T: #trait_name> #implvtbl_name<T> {
                     const VTABLE: #vtable_name = #vtable_name::new::<T>();
                 }
+                #[automatically_derived]
                 impl #name {
                     fn new<'a, T: #trait_name>(this: &'a T) -> ::windows_core::ScopedInterface<'a, #name> {
                         let this = ::windows_core::ScopedHeap { vtable: &#implvtbl_name::<T>::VTABLE as *const _ as *const _, this: this as *const _ as *const _ };
@@ -365,27 +378,33 @@ impl Interface {
         let name = &self.name;
         let name_string = format!("{name}");
         quote! {
+            #[automatically_derived]
             impl ::core::convert::From<#name> for ::windows_core::IUnknown {
                 fn from(value: #name) -> Self {
                     unsafe { ::core::mem::transmute(value) }
                 }
             }
+            #[automatically_derived]
             impl ::core::convert::From<&#name> for ::windows_core::IUnknown {
                 fn from(value: &#name) -> Self {
                     ::core::convert::From::from(::core::clone::Clone::clone(value))
                 }
             }
+            #[automatically_derived]
             impl ::core::clone::Clone for #name {
                 fn clone(&self) -> Self {
                     Self(self.0.clone())
                 }
             }
+            #[automatically_derived]
             impl ::core::cmp::PartialEq for #name {
                 fn eq(&self, other: &Self) -> bool {
                     self.0 == other.0
                 }
             }
+            #[automatically_derived]
             impl ::core::cmp::Eq for #name {}
+            #[automatically_derived]
             impl ::core::fmt::Debug for #name {
                 fn fmt(&self, f: &mut ::core::fmt::Formatter<'_>) -> ::core::fmt::Result {
                     f.debug_tuple(#name_string).field(&::windows_core::Interface::as_raw(self)).finish()
