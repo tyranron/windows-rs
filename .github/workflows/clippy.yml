@@ -27,6 +27,10 @@ jobs:
       - name: Fix environment
         uses: ./.github/actions/fix-environment
 
+      - run: cargo install cargo-expand
+      - run: rustup toolchain install nightly
+      - run: cargo +nightly expand -p test_implement --test lint_suppression
+
       - name: Check windows-implement
         run:  cargo clippy -p windows-implement
       - name: Check windows-implement codegen
